@@ -1,0 +1,23 @@
+{
+  "name": "siva-mart-login",
+  "version": "1.0.0",
+  "private": true,
+  "main": "backend/server.js",
+  "scripts": {
+    "start": "node backend/server.js",
+    "start:8081": "node backend/start-8081.js",
+    "start:8082": "node backend/start-8082.js",
+    "start:8083": "node backend/start-8083.js",
+    "start:8084": "node backend/start-8084.js",
+    "start:8085": "node backend/start-8085.js",
+    "build:native": "cmake -G \"MinGW Makefiles\" -S backend -B backend/build && cmake --build backend/build --config Release",
+    "start:native": "backend\\build\\Release\\siva_mart.exe"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.6",
+    "dotenv": "^16.6.1",
+    "express": "^5.2.1",
+    "pg": "^8.23.0"
+  }
+}

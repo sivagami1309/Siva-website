@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#f5f0e8">
+    <title>Sign in | SIVA MART</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="page-shell">
+    <section class="brand-panel" aria-label="siva_mart introduction">
+      <div class="brand-mark"><span>sm</span></div>
+      <p class="eyebrow">Everyday goods, thoughtfully gathered</p>
+      <h1>Good things<br><em>come home.</em></h1>
+      <p class="brand-copy">A warmer way to shop, sell, and keep the shelves moving.</p>
+      <div class="store-note"><span class="status-dot"></span> siva_mart is open today</div>
+      <div class="illustration" aria-hidden="true">
+        <div class="sun"></div>
+        <div class="hill hill-back"></div>
+        <div class="hill hill-front"></div>
+        <div class="basket"><span></span><span></span><span></span></div>
+      </div>
+      <p class="copyright">© 2026 siva_mart</p>
+    </section>
+
+    <section class="login-panel">
+      <div class="login-card">
+        <div class="mobile-brand"><span class="brand-mark small"><span>sm</span></span><strong>siva_mart</strong></div>
+        <div class="heading-block" id="login-heading">
+          <p class="eyebrow accent-text" id="role-eyebrow">Welcome back</p>
+          <h2 id="login-title">Sign in as a buyer</h2>
+          <p id="login-subtitle">Pick up where you left off.</p>
+        </div>
+
+        <div class="role-tabs" role="tablist" aria-label="Choose account type">
+          <button class="role-tab active" data-role="buyer" role="tab" aria-selected="true">Buyer</button>
+          <button class="role-tab" data-role="seller" role="tab" aria-selected="false">Seller</button>
+          <button class="role-tab" data-role="admin" role="tab" aria-selected="false">Admin</button>
+        </div>
+
+        <form id="login-form" novalidate>
+          <label for="email">Email address</label>
+          <input id="email" name="email" type="email" autocomplete="email" placeholder="you@example.com" required>
+          <div class="password-label"><label for="password">Password</label><a href="#" id="forgot-link">Forgot password?</a></div>
+          <div class="password-wrap">
+            <input id="password" name="password" type="password" autocomplete="current-password" placeholder="Enter your password" required>
+            <button type="button" class="password-toggle" id="password-toggle" aria-label="Show password">Show</button>
+          </div>
+          <label class="remember"><input type="checkbox" id="remember"><span>Keep me signed in</span></label>
+          <button class="submit-button" type="submit"><span id="submit-text">Continue as buyer</span><span class="arrow">&#8594;</span></button>
+          <p class="form-message" id="form-message" role="status" aria-live="polite"></p>
+        </form>
+
+        <p class="account-switch">New to SIVA MART? <button type="button" id="show-signup">Create Account</button></p>
+
+        <form id="signup-form" class="hidden-form" novalidate>
+          <label for="full-name">Full Name</label>
+          <input id="full-name" name="full_name" type="text" autocomplete="name" placeholder="Your full name" required>
+          <div id="store-name-field" class="hidden-form">
+            <label for="store-name">Store Name</label>
+            <input id="store-name" name="store_name" type="text" autocomplete="organization" placeholder="Your shop name">
+          </div>
+          <label for="signup-email">Email address</label>
+          <input id="signup-email" name="email" type="email" autocomplete="email" placeholder="you@example.com" required>
+          <label for="signup-password">Password</label>
+          <input id="signup-password" name="password" type="password" autocomplete="new-password" placeholder="Create a password" required>
+          <label for="confirm-password">Confirm Password</label>
+          <input id="confirm-password" name="confirm_password" type="password" autocomplete="new-password" placeholder="Repeat your password" required>
+          <label for="signup-role">Account Type</label>
+          <select id="signup-role" name="role">
+            <option value="buyer">Buyer</option>
+            <option value="seller">Seller</option>
+          </select>
+          <button class="submit-button" type="submit"><span>Create Account</span><span class="arrow">&#8594;</span></button>
+          <p class="form-message" id="signup-message" role="status" aria-live="polite"></p>
+          <p class="account-switch">Already have an account? <button type="button" id="show-login">Login</button></p>
+        </form>
+
+        <div class="account-summary hidden-form" id="account-summary">
+          <p class="eyebrow accent-text">You are signed in</p>
+          <h3 id="account-name"></h3>
+          <p id="account-role"></p>
+          <button class="submit-button" type="button" id="logout-button">Logout</button>
+        </div>
+        <p class="terms">By continuing, you agree to siva_mart's <a href="#">Terms</a> and <a href="#">Privacy Policy</a>.</p>
+      </div>
+    </section>
+  </main>
+
+  <section id="buyer-app" class="commerce-app hidden-form">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow accent-text">SIVA_MART</p>
+        <h3>Buyer home</h3>
+      </div>
+      <button type="button" id="buyer-logout" class="secondary-button">Logout</button>
+    </header>
+
+    <div class="shop-layout">
+      <aside class="shop-sidebar">
+        <div class="sidebar-block">
+          <h4>Browse</h4>
+          <input id="buyer-search" type="search" placeholder="Search products" />
+        </div>
+
+        <div class="sidebar-block">
+          <h4>Categories</h4>
+          <div id="category-list" class="category-list"></div>
+        </div>
+
+        <div class="sidebar-block">
+          <h4>Quick links</h4>
+          <button type="button" class="nav-link" data-view="products">Products</button>
+          <button type="button" class="nav-link" data-view="wishlist">Wishlist</button>
+          <button type="button" class="nav-link" data-view="orders">My Orders</button>
+        </div>
+      </aside>
+
+      <main class="shop-main">
+        <div class="stats-row">
+          <div class="stat-card"><span>Products</span><strong id="product-count">0</strong></div>
+          <div class="stat-card"><span>Cart</span><strong id="cart-count">0</strong></div>
+          <div class="stat-card"><span>Wishlist</span><strong id="wishlist-count">0</strong></div>
+        </div>
+
+        <div class="catalog-panel">
+          <div class="panel-header">
+            <h4>Products</h4>
+          </div>
+          <div id="buyer-products" class="product-grid"></div>
+        </div>
+      </main>
+
+      <aside class="cart-panel">
+        <div class="cart-card">
+          <h4>Cart</h4>
+          <div id="cart-items" class="mini-list"></div>
+          <div class="cart-totals">
+            <div><span>Items</span><strong id="cart-total-items">0</strong></div>
+            <div><span>Subtotal</span><strong id="cart-subtotal">₹0.00</strong></div>
+          </div>
+          <button type="button" id="checkout-button" class="submit-button">Proceed to Checkout</button>
+          <button type="button" id="clear-cart" class="secondary-button full-width">Clear Cart</button>
+        </div>
+
+        <div class="cart-card">
+          <h4>Wishlist</h4>
+          <div id="wishlist-items" class="mini-list"></div>
+        </div>
+
+        <div class="cart-card">
+          <h4>My Orders</h4>
+          <div id="order-history" class="mini-list"></div>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <section id="seller-app" class="commerce-app hidden-form">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow accent-text">Seller</p>
+        <h3>Seller Dashboard</h3>
+        <p id="seller-store-name" class="seller-store-name hidden-form"></p>
+      </div>
+      <button type="button" id="seller-logout" class="secondary-button">Logout</button>
+    </header>
+
+    <div class="seller-grid">
+      <aside class="seller-panel">
+        <h4>Add / Edit Product</h4>
+        <form id="seller-product-form" class="seller-form">
+          <input type="hidden" id="product-id" />
+          <label>Product Name<input id="product-name" type="text" required /></label>
+          <label>Category<input id="product-category" type="text" placeholder="Electronics" /></label>
+          <label>Description<textarea id="product-description" rows="3" placeholder="Short product description"></textarea></label>
+          <label>Price<input id="product-price" type="number" min="0" step="0.01" required /></label>
+          <label>Stock<input id="product-stock" type="number" min="0" step="1" required /></label>
+          <label>Image URL<input id="product-image" type="url" placeholder="https://..." /></label>
+          <label>Brand<input id="product-brand" type="text" placeholder="Brand name" /></label>
+          <button type="submit" class="submit-button">Save Product</button>
+          <button type="button" id="cancel-edit" class="secondary-button full-width">Cancel Edit</button>
+        </form>
+      </aside>
+
+      <main class="seller-list-panel">
+        <div class="panel-header">
+          <h4>My Products</h4>
+        </div>
+        <div id="seller-products" class="seller-products"></div>
+      </main>
+
+      <aside class="seller-orders-panel">
+        <div class="panel-header">
+          <h4>Orders</h4>
+        </div>
+        <div id="seller-orders" class="order-list"></div>
+      </aside>
+    </div>
+  </section>
+
+  <section id="admin-app" class="admin-app hidden-form">
+    <div class="admin-shell">
+      <aside class="admin-sidebar">
+        <div class="admin-brand">
+          <span class="brand-mark small"><span>sm</span></span>
+          <div>
+            <p class="admin-brand-label">SIVA MART</p>
+            <strong>Administration</strong>
+          </div>
+        </div>
+
+        <div class="admin-profile-box">
+          <span class="admin-avatar">A</span>
+          <div>
+            <p class="eyebrow accent-text admin-profile-eyebrow">Admin</p>
+            <strong id="admin-profile-name">Siva Mart Admin</strong>
+          </div>
+        </div>
+
+        <nav class="admin-nav" aria-label="Admin navigation">
+          <button type="button" class="admin-nav-btn active" data-admin-view="overview">Overview</button>
+          <button type="button" class="admin-nav-btn" data-admin-view="users">Users</button>
+          <button type="button" class="admin-nav-btn" data-admin-view="products">Products</button>
+          <button type="button" class="admin-nav-btn" data-admin-view="orders">Orders</button>
+        </nav>
+
+        <button type="button" id="admin-logout" class="submit-button admin-logout-btn">Logout</button>
+      </aside>
+
+      <main class="admin-main">
+        <header class="admin-topbar">
+          <div>
+            <p class="eyebrow accent-text">Operations</p>
+            <h3 id="admin-page-title">Overview</h3>
+          </div>
+        </header>
+
+        <section id="admin-overview" class="admin-section">
+          <div class="admin-summary-grid">
+            <article class="admin-stat-card">
+              <span>Total Users</span>
+              <strong id="admin-total-users">0</strong>
+            </article>
+            <article class="admin-stat-card">
+              <span>Total Buyers</span>
+              <strong id="admin-total-buyers">0</strong>
+            </article>
+            <article class="admin-stat-card">
+              <span>Total Sellers</span>
+              <strong id="admin-total-sellers">0</strong>
+            </article>
+            <article class="admin-stat-card">
+              <span>Total Products</span>
+              <strong id="admin-total-products">0</strong>
+            </article>
+            <article class="admin-stat-card">
+              <span>Total Orders</span>
+              <strong id="admin-total-orders">0</strong>
+            </article>
+            <article class="admin-stat-card">
+              <span>Total Order Value</span>
+              <strong id="admin-total-order-value">₹0.00</strong>
+            </article>
+          </div>
+        </section>
+
+        <section id="admin-users" class="admin-section hidden-form">
+          <div class="admin-panel-header">
+            <div>
+              <p class="eyebrow accent-text">Management</p>
+              <h4>Users</h4>
+            </div>
+          </div>
+          <div class="admin-toolbar">
+            <input id="admin-user-search" type="search" placeholder="Search by name or email" />
+            <select id="admin-user-role-filter">
+              <option value="all">All roles</option>
+              <option value="buyer">Buyers</option>
+              <option value="seller">Sellers</option>
+              <option value="admin">Admins</option>
+            </select>
+          </div>
+          <div class="admin-table-wrap">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Full Name</th>
+                  <th>Email</th>
+                  <th>Role</th>
+                  <th>Joined</th>
+                </tr>
+              </thead>
+              <tbody id="admin-users-body"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section id="admin-products" class="admin-section hidden-form">
+          <div class="admin-panel-header">
+            <div>
+              <p class="eyebrow accent-text">Catalog</p>
+              <h4>Products</h4>
+            </div>
+            <button type="button" id="admin-refresh-products" class="secondary-button">Refresh</button>
+          </div>
+          <div class="admin-toolbar">
+            <input id="admin-product-search" type="search" placeholder="Search products" />
+            <select id="admin-product-category-filter">
+              <option value="all">All categories</option>
+            </select>
+          </div>
+          <div class="admin-table-wrap">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Name</th>
+                  <th>Price</th>
+                  <th>Stock</th>
+                  <th>Category</th>
+                  <th>Seller</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="admin-products-body"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section id="admin-orders" class="admin-section hidden-form">
+          <div class="admin-panel-header">
+            <div>
+              <p class="eyebrow accent-text">Transactions</p>
+              <h4>Orders</h4>
+            </div>
+          </div>
+          <div class="admin-toolbar">
+            <input id="admin-order-search" type="search" placeholder="Search orders or buyer" />
+            <select id="admin-order-status-filter">
+              <option value="all">All statuses</option>
+              <option value="confirmed">Confirmed</option>
+              <option value="processing">Processing</option>
+              <option value="shipped">Shipped</option>
+              <option value="delivered">Delivered</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+          </div>
+          <div class="admin-table-wrap">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Order ID</th>
+                  <th>Buyer</th>
+                  <th>Status</th>
+                  <th>Total</th>
+                  <th>Items</th>
+                  <th>Placed</th>
+                </tr>
+              </thead>
+              <tbody id="admin-orders-body"></tbody>
+            </table>
+          </div>
+        </section>
+      </main>
+    </div>
+  </section>
+
+  <script src="app.js"></script>
+</body>
+</html>
