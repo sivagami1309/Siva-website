@@ -13,3 +13,5 @@ build-nmake44/
 *.exe
 backend/build-ninja/
 
+.vercel
+.env*
