@@ -10,12 +10,16 @@ const { Pool } = require("pg");
 const app = express();
 const PORT = process.env.PORT || 8080;
 const pool = new Pool({
-  host: process.env.PGHOST || "localhost",
-  port: Number(process.env.PGPORT || 5432),
-  database: process.env.PGDATABASE || "siva_mart",
-  user: process.env.PGUSER,
-  password: process.env.PGPASSWORD
+
+  connectionString: process.env.DATABASE_URL || undefined,
+  host: process.env.DATABASE_URL ? undefined : (process.env.PGHOST || "localhost"),
+  port: process.env.DATABASE_URL ? undefined : Number(process.env.PGPORT || 5432),
+  database: process.env.DATABASE_URL ? undefined : (process.env.PGDATABASE || "siva_mart"),
+  user: process.env.DATABASE_URL ? undefined : process.env.PGUSER,
+  password: process.env.DATABASE_URL ? undefined : process.env.PGPASSWORD,
+  ssl: process.env.DATABASE_URL ? { rejectUnauthorized: false } : false
 });
+
 
 async function ensureDatabaseSchema() {
   await pool.query(`
