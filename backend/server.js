@@ -20,8 +20,11 @@ const pool = new Pool({
   ssl: process.env.DATABASE_URL ? { rejectUnauthorized: false } : false
 });
 
+const SCHEMA_LOCK_NAMESPACE = 24680;
+const SCHEMA_LOCK_KEY = 13579;
+let schemaInitialization;
 
-async function ensureDatabaseSchema() {
+async function runDatabaseSchema() {
   await pool.query(`
     CREATE TABLE IF NOT EXISTS buyers (
       id SERIAL PRIMARY KEY,
@@ -146,23 +149,29 @@ async function ensureDatabaseSchema() {
       CONSTRAINT payments_order_id_fkey FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE
     );
   `);
-  // ============================================================
-  // FIX PRODUCTS -> SELLERS FOREIGN KEY
-  // products.seller_id must refer to sellers.id
-  // ============================================================
   try {
     await pool.query(`
-      ALTER TABLE products
-      DROP CONSTRAINT IF EXISTS products_seller_id_fkey;
+      DO $$
+      BEGIN
+        IF NOT EXISTS (
+          SELECT 1
+          FROM pg_constraint
+          WHERE conrelid = 'products'::regclass
+            AND conname = 'products_seller_id_fkey'
+            AND confrelid = 'sellers'::regclass
+        ) THEN
+          ALTER TABLE products
+          DROP CONSTRAINT IF EXISTS products_seller_id_fkey;
 
-      ALTER TABLE products
-      ADD CONSTRAINT products_seller_id_fkey
-      FOREIGN KEY (seller_id)
-      REFERENCES sellers(id)
-      ON DELETE CASCADE;
+          ALTER TABLE products
+          ADD CONSTRAINT products_seller_id_fkey
+          FOREIGN KEY (seller_id)
+          REFERENCES sellers(id)
+          ON DELETE CASCADE;
+        END IF;
+      END
+      $$;
     `);
-
-    console.log("Products seller foreign key is correct.");
   } catch (error) {
     console.error(
       "Products seller FK migration warning:",
@@ -198,6 +207,40 @@ async function ensureDatabaseSchema() {
     CREATE INDEX IF NOT EXISTS idx_order_items_order_id ON order_items(order_id);
     CREATE INDEX IF NOT EXISTS idx_payments_order_id ON payments(order_id);
   `);
+}
+
+async function ensureDatabaseSchema() {
+  const lockClient = await pool.connect();
+  let lockAcquired = false;
+  try {
+    await lockClient.query("SELECT pg_advisory_lock($1, $2)", [
+      SCHEMA_LOCK_NAMESPACE,
+      SCHEMA_LOCK_KEY
+    ]);
+    lockAcquired = true;
+    await runDatabaseSchema();
+  } finally {
+    try {
+      if (lockAcquired) {
+        await lockClient.query("SELECT pg_advisory_unlock($1, $2)", [
+          SCHEMA_LOCK_NAMESPACE,
+          SCHEMA_LOCK_KEY
+        ]);
+      }
+    } finally {
+      lockClient.release();
+    }
+  }
+}
+
+function getSchemaReady() {
+  if (!schemaInitialization) {
+    schemaInitialization = ensureDatabaseSchema().catch((error) => {
+      schemaInitialization = undefined;
+      throw error;
+    });
+  }
+  return schemaInitialization;
 }
 
 async function getUserProfile(userId) {
@@ -343,6 +386,21 @@ async function getCategoryId(name) {
 app.use(cors());
 app.use(express.json({ limit: "20kb" }));
 app.use(express.static(path.join(__dirname, "..", "frontend")));
+app.use("/api", async (request, response, next) => {
+  if (request.path === "/health") {
+    return next();
+  }
+
+  try {
+    await getSchemaReady();
+    return next();
+  } catch (error) {
+    console.error("Database schema initialization failed:", error.message);
+    return response.status(503).json({
+      message: "The database is temporarily unavailable."
+    });
+  }
+});
 
 app.post("/api/register", async (request, response) => {
   try {
@@ -1527,24 +1585,18 @@ app.post("/api/orders", async (request, response) => {
   }
 });
 
-app.get("/api/health", async (_request, response) => {
-  try {
-    await pool.query("SELECT 1");
-    response.json({ status: "ok", database: "connected" });
-  } catch (error) {
-    console.error("Database health check failed:", error.message);
-    response.status(503).json({ status: "error", database: "disconnected" });
-  }
-});
-
 async function startServer() {
-  await ensureDatabaseSchema();
+  await getSchemaReady();
   app.listen(PORT, () => {
     console.log(`SIVA_MART login server is running at http://localhost:${PORT}`);
   });
 }
 
-startServer().catch((error) => {
-  console.error("Server failed to start:", error?.stack || error );
-  process.exit(1);
-});
+if (require.main === module) {
+  startServer().catch((error) => {
+    console.error("Server failed to start:", error?.stack || error);
+    process.exit(1);
+  });
+}
+
+module.exports = app;

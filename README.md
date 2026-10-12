@@ -51,6 +51,20 @@ Open http://localhost:8080. The backend serves the files from `frontend/` and ex
 
 If an older server is still occupying port 8080, run `npm run start:8081` and open http://localhost:8081 instead. If that port is also occupied by an older server, use the matching available server script (`start:8082` through `start:8085`) and open the matching localhost port.
 
+## Deploy to Vercel
+
+Set the Vercel project's Root Directory to the repository root containing `vercel.json`, `package.json`, `backend/`, and `frontend/`. The Vercel Node function exports the Express app, while `vercel.json` routes requests to it and bundles the frontend files it serves.
+
+Configure the database variables in the Vercel project's Environment Variables (for the Production environment, and Preview if needed). Use `DATABASE_URL` for the hosted PostgreSQL connection, or configure `PGHOST`, `PGPORT`, `PGDATABASE`, `PGUSER`, and `PGPASSWORD`. Do not commit environment files or database credentials.
+
+Deploy from this project directory with:
+
+```powershell
+npx vercel --prod
+```
+
+The database schema setup runs once per warm function instance and serializes concurrent cold-start setup through a PostgreSQL advisory lock. The health route checks database connectivity; a successful local check does not confirm the Vercel deployment or its configured database.
+
 The registration form sends `POST /api/register`. The backend normalizes the email, checks for duplicates, hashes the password with bcryptjs, and inserts the new user into the existing `users` table. Seller registration also requires a store name, which is saved to `sellers.store_name` and displayed in the seller dashboard after login. The login form sends `POST /api/login`, which checks the bcrypt password and selected Buyer/Seller/Admin role, then returns the account profile, including the seller store name when applicable.
 
 ## Test an account
